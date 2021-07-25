@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            * {
+              box-sizing: border-box;
+            }
+
+            /* Create two equal columns that floats next to each other */
+            .column {
+              float: left;
+              width: 50%;
+              padding: 0 30px;
+            }
+
+            
+        </style>
+    </head>
+    <body style="background-color:DodgerBlue;">
+
+        <div class="row">
+            <div class="column">
+                <h3>Web User</h3>
+
+                <label for="userrName">User Name:</label>
+                <input type="text" id="userName" name="userName"><br><br>
+                <label for="userAge">User Age:</label>
+                <input type="number" id="userAge" name="userAge" maxlength="2"
+                    oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);"><br><br>
+                <input id="button" type="button" value="Submit Web User" onClick="webUserSubmit()">
+
+            </div>
+            <div class="column">
+                <h3>Native User</h3>
+                <label >User Name:</label>
+                <label id="nativeUserName"></label><br><br>
+                <label >User Age:</label>
+                <label id="nativeUserAge"></label><br><br>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            function webUserSubmit() {
+                var name = document.getElementById("userName").value;
+                var age = parseInt(document.getElementById("userAge").value);
+                var user = {
+                    'name': name,
+                    'age': age
+                };
+                var userJsonString = JSON.stringify(user)
+                NativeComponent.onUserSubmitFromWeb(userJsonString);
+                window.webkit.messageHandlers.NativeComponent.postMessage(userJsonString);
+            }
+        </script>
+        <script type="text/javascript">
+            function nativeUserSubmit(userJson){
+               var user = JSON.parse(userJson);
+               document.getElementById("nativeUserName").innerHTML = user.name;
+               document.getElementById("nativeUserAge").innerHTML = user.age;
+            }
+         </script>
+    </body>
+</html>

@@ -1,0 +1,10 @@
+<resources>
+	<string name="app_name">SonarWorksTest</string>
+    <string name="webview_user_name">Name: %1$s</string>
+    <string name="webview_user_age">Age: %1$s</string>
+    <string name="versus">Vs.</string>
+    <string name="webview_user_title">WebView User</string>
+    <string name="submit_button">Submit User to Web</string>
+    <string name="native_user_name">User name</string>
+    <string name="native_user_age">User age</string>
+</resources>
