@@ -15,13 +15,13 @@ import org.reactivestreams.Publisher
 class WebBridgeImpl : WebBridge {
     private val _userStream = BehaviorSubject.create<User>()
 
-    override val componentName = "NativeComponent"
+    override val nativeComponentName = "NativeComponent"
 
     override val htmlFilePath: String = "file:///android_res/raw/sonarwork_page.html"
 
-    override fun getUserStream(): Observable<User> = _userStream.hide()
+    override fun getWebUserStream(): Observable<User> = _userStream.hide()
 
-    override fun submitNativeUserEvaluation(user: User): String {
+    override fun getSubmitNativeUserEvaluation(user: User): String {
         return "javascript: " + "nativeUserSubmit(\'" + Json.encodeToString(user) +
                 "\')"
     }

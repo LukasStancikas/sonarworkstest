@@ -41,11 +41,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupViews() {
         binding.nativeUserSubmit.setOnClickListener { onNativeButtonClick() }
-        binding.webView.addJavascriptInterface(webBridge, webBridge.componentName)
+        binding.webView.addJavascriptInterface(webBridge, webBridge.nativeComponentName)
     }
 
     private fun subscribeToWebListener() {
-        webBridge.getUserStream()
+        webBridge.getWebUserStream()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.webView.evaluateJavascript(
-            webBridge.submitNativeUserEvaluation(user),
+            webBridge.getSubmitNativeUserEvaluation(user),
             null
         )
     }

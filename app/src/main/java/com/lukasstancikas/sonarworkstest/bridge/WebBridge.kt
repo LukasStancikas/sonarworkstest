@@ -7,13 +7,13 @@ import io.reactivex.rxjava3.core.Observable
 
 interface WebBridge {
 
-    val componentName: String
+    val nativeComponentName: String
 
     val htmlFilePath: String
 
-    fun getUserStream() : Observable<User>
+    fun getWebUserStream() : Observable<User>
 
-    fun submitNativeUserEvaluation(user: User): String
+    fun getSubmitNativeUserEvaluation(user: User): String
 
     @JavascriptInterface
     fun onUserSubmitFromWeb(userJson: String)
