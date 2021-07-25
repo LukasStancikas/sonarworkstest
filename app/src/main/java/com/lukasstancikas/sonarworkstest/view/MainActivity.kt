@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        subscribeToWebListener()
+        subscribeToWebBridge()
     }
 
     override fun onStop() {
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         binding.webView.addJavascriptInterface(webBridge, webBridge.nativeComponentName)
     }
 
-    private fun subscribeToWebListener() {
+    private fun subscribeToWebBridge() {
         webBridge.getWebUserStream()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
