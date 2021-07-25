@@ -11,7 +11,7 @@ object MainModule {
     fun get(): Module {
         return module {
             single<WebBridge> { WebBridgeImpl() }
-            viewModel { MainViewModel() }
+            viewModel { MainViewModel(get() as WebBridge) }
         }
     }
 }

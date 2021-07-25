@@ -1,8 +1,6 @@
 package com.lukasstancikas.sonarworkstest.bridge.android
 
 import android.webkit.JavascriptInterface
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.lukasstancikas.sonarworkstest.bridge.WebBridge
 import com.lukasstancikas.sonarworkstest.model.User
 import io.reactivex.rxjava3.core.Observable
@@ -24,6 +22,7 @@ class WebBridgeImpl : WebBridge {
         return "javascript: " + "nativeUserSubmit(\'" + Json.encodeToString(user) +
                 "\')"
     }
+
     @JavascriptInterface
     override fun onUserSubmitFromWeb(userJson: String) {
         val webPlayer = Json.decodeFromString<User>(userJson)

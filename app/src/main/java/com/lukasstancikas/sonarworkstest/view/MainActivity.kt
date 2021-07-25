@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.lukasstancikas.sonarworkstest.R
-import com.lukasstancikas.sonarworkstest.bridge.WebBridge
+import com.lukasstancikas.sonarworkstest.bridge.UserJavascriptInterface
 import com.lukasstancikas.sonarworkstest.databinding.ActivityMainBinding
 import com.lukasstancikas.sonarworkstest.extensions.asDriver
 import com.lukasstancikas.sonarworkstest.model.User
@@ -15,7 +15,6 @@ import com.lukasstancikas.sonarworkstest.viewmodel.MainViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -23,7 +22,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val webBridge: WebBridge by inject()
     private val viewModel: MainViewModel by viewModel()
     private val compositeDisposable = CompositeDisposable()
 
@@ -33,13 +31,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupViews()
-        loadHtmlAsset()
     }
 
     override fun onStart() {
         super.onStart()
-        subscribeToWebBridge()
         subscribeToViewModel()
+        viewModel.dispatch(MainUIEvent.Init)
     }
 
     override fun onStop() {
@@ -49,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupViews() {
         binding.nativeUserSubmit.setOnClickListener { onNativeButtonClick() }
-        binding.webView.addJavascriptInterface(webBridge, webBridge.nativeComponentName)
     }
 
     private fun subscribeToViewModel() {
@@ -60,6 +56,7 @@ class MainActivity : AppCompatActivity() {
                 onError = Timber::e
             )
             .addTo(compositeDisposable)
+
         viewModel.uiEffects
             .asDriver()
             .subscribeBy(
@@ -69,13 +66,19 @@ class MainActivity : AppCompatActivity() {
             .addTo(compositeDisposable)
     }
 
-    private fun onNewUiEffect(effect: MainUIEffect) {
-        val messageRes = when (effect) {
-            MainUIEffect.SameNativeUserMessage -> R.string.native_user_same
-            MainUIEffect.SameWebUserMessage -> R.string.web_user_same
+    private fun onNewUiEffect(effect: MainUIEffect) =
+        when (effect) {
+            MainUIEffect.SameNativeUserMessage -> {
+                Toast.makeText(this, R.string.native_user_same, Toast.LENGTH_SHORT).show()
+            }
+            MainUIEffect.SameWebUserMessage -> {
+                Toast.makeText(this, R.string.web_user_same, Toast.LENGTH_SHORT).show()
+            }
+            is MainUIEffect.EvaluateJavascript -> {
+                binding.webView.evaluateJavascript(effect.evaluation, null)
+            }
+            is MainUIEffect.LoadUrl -> loadUrlWithInterface(effect.url, effect.jsInterface)
         }
-        Toast.makeText(this, messageRes, Toast.LENGTH_SHORT).show()
-    }
 
     private fun onNewUiState(state: MainUIState) = with(binding) {
         state.currentWebUser?.let {
@@ -90,27 +93,19 @@ class MainActivity : AppCompatActivity() {
         webUserCount.text = getString(R.string.webview_user_count, state.webUserSubmitCount)
     }
 
-    private fun subscribeToWebBridge() {
-        webBridge.getWebUserStream()
-            .asDriver()
-            .subscribeBy(
-                onNext = { viewModel.dispatch(MainUIEvent.WebUserReceived(it)) },
-                onError = Timber::e
-            )
-            .addTo(compositeDisposable)
-    }
-
     private fun onNativeButtonClick() {
         val user = User(
             name = binding.nativeUserName.text.toString(),
             age = binding.nativeUserAge.text.toString().toIntOrNull() ?: 0
         )
         viewModel.dispatch(MainUIEvent.NativeUserSubmitted(user))
-        binding.webView.evaluateJavascript(webBridge.getSubmitNativeUserEvaluation(user), null)
     }
 
-    private fun loadHtmlAsset() {
-        binding.webView.loadUrl(webBridge.htmlFilePath);
-        binding.webView.settings.javaScriptEnabled = true
-    }
+    private fun loadUrlWithInterface(url: String, jsInterface: UserJavascriptInterface) =
+        with(binding) {
+            webView.removeJavascriptInterface(jsInterface.nativeComponentName)
+            webView.addJavascriptInterface(jsInterface, jsInterface.nativeComponentName)
+            webView.loadUrl(url)
+            webView.settings.javaScriptEnabled = true
+        }
 }
