@@ -49,8 +49,12 @@
                     'age': age
                 };
                 var userJsonString = JSON.stringify(user)
-                NativeComponent.onUserSubmitFromWeb(userJsonString);
-                window.webkit.messageHandlers.NativeComponent.postMessage(userJsonString);
+                if (NativeComponent != null) {
+                    NativeComponent.onUserSubmitFromWeb(userJsonString);
+                }
+                if (window.webkit.messageHandlers != null) {
+                    window.webkit.messageHandlers.NativeComponent.postMessage(userJsonString);
+                }
             }
         </script>
         <script type="text/javascript">

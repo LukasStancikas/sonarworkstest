@@ -10,7 +10,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.reactivestreams.Publisher
 
 class WebBridgeImpl : WebBridge {
     private val _userStream = BehaviorSubject.create<User>()
